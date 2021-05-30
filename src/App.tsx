@@ -1,26 +1,50 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useEffect } from 'react';
+
+import {
+  BrowserRouter as Router,
+  Redirect,
+  Route,
+  Switch,
+} from 'react-router-dom';
+
 import './App.css';
 
-function App() {
+import { AdminDashboard } from './containers/AdminDashboard';
+import { Dashboard } from './containers/Dashboard';
+import { ProtectedRoute } from './components/ProtectedRoute';
+
+import { AdminGuard } from './guards/admin-guard';
+
+const App = () => {
+  useEffect(() => {
+    // Mocking the local storage to have a user data
+    const user = {
+      firstName: 'JM',
+      lastName: 'Santos',
+      roles: ['basic'],
+    };
+    window.localStorage.setItem('user', JSON.stringify(user));
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div className="App">
+        Welcome to ProtectedRoute with Guard functions tutorial
+        <Switch>
+          <ProtectedRoute
+            path="/admin"
+            guards={[AdminGuard]}
+            fallback={() => <Redirect to="/home" />}
+          >
+            <AdminDashboard />
+          </ProtectedRoute>
+          <Route path="/home">
+            <Dashboard />
+          </Route>
+        </Switch>
+      </div>
+    </Router>
   );
-}
+};
 
 export default App;
